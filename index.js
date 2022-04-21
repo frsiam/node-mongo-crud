@@ -20,9 +20,19 @@ async function run(){
     try{
         await client.connect();
         const userCollection = client.db('foodExpress').collection('user');
-        const user = {name: 'islam', email: "islam@muslim.com"};
-        const result = await userCollection.insertOne(user);
-        console.log(`user inserted with id: ${result.insertedId}`)
+        app.get('/user',async(req,res)=>{
+            const query = {};
+            const cursor = userCollection.find(query);
+            const users = await cursor.toArray();
+            res.send(users);
+        })
+        //POST user: add a new user
+        app.post('/user',async(req, res)=>{
+            const newUser = req.body;
+            console.log('adding new user', newUser);
+            const result = await userCollection.insertOne(newUser);
+            res.send(result);
+        })
     }
     finally{
         // await client.close();
@@ -33,7 +43,7 @@ run().catch(console.dir)
 
 
 app.get('/', (req,res)=>{
-    res.send('running my node crud server');
+    res.send({data: 'running my node crud server'});
 })
 
 app.listen(port, ()=>{
